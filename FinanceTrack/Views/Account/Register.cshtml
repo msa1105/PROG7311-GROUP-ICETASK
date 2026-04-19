@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Register - FinanceTrack</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body { background-color: var(--bg-primary); display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .auth-container { background: var(--bg-card); width: 440px; padding: 40px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .auth-container .brand { margin-bottom: 24px; font-size: 28px; justify-content: center; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; }
+        .form-control:focus { outline: none; border-color: var(--accent); }
+        .btn-full { width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
+        .error-msg { color: var(--danger); font-size: 14px; margin-bottom: 16px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="brand" style="text-align: center; color: var(--text-primary);">
+            Finance<span style="color: var(--accent);">Track</span>
+        </div>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 32px;">Create a new account.</p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-msg">@ViewBag.Error</div>
+        }
+
+        <form method="post" action="/Account/Register">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" id="email" name="email" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password (Any for dummy auth)</label>
+                <input type="password" id="password" name="password" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="role">Role Select</label>
+                <select id="role" name="role" class="form-control" required>
+                    <option value="Staff">Staff</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-full">Sign Up</button>
+        </form>
+        <div style="text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-secondary);">
+            Already have an account? <a href="/Account/Login" style="color: var(--accent); text-decoration: none; font-weight: 500;">Sign in</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h1>Dashboard Overview</h1>
+        <p>Your financial summary at a glance</p>
+    </div>
+</div>
+
+<div class="grid-cards">
+    <div class="card">
+        <div class="card-title">Total Balance</div>
+        <div class="card-value positive">R @ViewBag.TotalBalance</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Net Position</div>
+        <div class="card-value">R @ViewBag.NetPosition</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Net Profit</div>
+        <div class="card-value positive">R @ViewBag.NetProfit</div>
+    </div>
+</div>
+
+<div class="chart-card">
+    <div class="card-title" style="margin-bottom: 20px;">Monthly Income vs Expenses (Mocked)</div>
+    <div style="position: relative; height: 300px; width: 100%;">
+        <canvas id="monthlyChart"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Nov 2025', 'Dec 2025', 'Jan 2026', 'Feb 2026', 'Mar 2026', 'Apr 2026'],
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: [32000, 39000, 36800, 44000, 41000, 52000],
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Expenses',
+                        data: [27000, 24000, 28670, 12000, 50000, 31000],
+                        backgroundColor: '#ef4444',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+}
