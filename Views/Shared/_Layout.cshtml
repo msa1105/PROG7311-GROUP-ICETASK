@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FinanceTrack</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            Finance<span>Track</span>
+        </div>
+        <nav class="nav-links">
+            <a href="/Home/Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">Dashboard</a>
+            <a href="/Transactions/Ledger" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Ledger" ? "active" : "")">Ledger</a>
+            <a href="/Transactions/ReceivablePayable" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "ReceivablePayable" ? "active" : "")">Receivable / Payable</a>
+            <a href="/Transactions/AssetsLiabilities" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "AssetsLiabilities" ? "active" : "")">Assets & Liabilities</a>
+        </nav>
+        
+        <form method="post" action="/Account/Logout" style="margin-top: auto;">
+            <button type="submit" class="btn btn-outline" style="width: 100%; border: none; text-align: left; justify-content: flex-start; padding: 10px 16px; color: var(--danger);">
+                Log out
+            </button>
+        </form>
+    </aside>
+
+    <main class="main-content">
+        @RenderBody()
+    </main>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
