@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Receivable / Payable";
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h1>Accounts Receivable & Payable</h1>
+        <p>Manage pending invoices and bills (Powered by Internal Web API)</p>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Entity</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="apiTableBody">
+            <tr>
+                <td colspan="7" style="text-align: center;">Loading from API...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/api/transactions')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('apiTableBody');
+                    tbody.innerHTML = '';
+                    
+                    // Filter to only show pending invoices/bills for this view
+                    const pendingList = data.filter(d => d.status === 'Pending' && (d.type === 'Receivable' || d.type === 'Liability' || d.type === 'Expense'));
+
+                    if (pendingList.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No pending invoices</td></tr>';
+                        return;
+                    }
+
+                    pendingList.forEach(tx => {
+                        const tr = document.createElement('tr');
+                        
+                        let badgeClass = tx.status.toLowerCase() === 'pending' ? 'pending' : 'paid';
+
+                        tr.innerHTML = `
+                            <td style="color: var(--text-secondary)">#${tx.id}</td>
+                            <td>${new Date(tx.date).toLocaleDateString()}</td>
+                            <td>${tx.type}</td>
+                            <td>${tx.entityName}</td>
+                            <td style="font-weight: 600;">R ${tx.amount}</td>
+                            <td><span class="badge ${badgeClass}">${tx.status}</span></td>
+                            <td>
+                                <button class="btn" style="padding: 6px 12px; font-size: 12px; background-color: var(--success);" onclick="markPaid(${tx.id})">
+                                    Mark Paid
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error("Error fetching from API:", error));
+        });
+
+        function markPaid(id) {
+            fetch(`/api/transactions/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify('Paid')
+            }).then(() => {
+                location.reload();
+            });
+        }
+    </script>
+}
