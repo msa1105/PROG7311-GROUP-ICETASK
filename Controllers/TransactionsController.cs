@@ -1,6 +1,8 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using FinanceTrack.Interfaces;
+using FinanceTrack.Models;
 
 namespace FinanceTrack.Controllers
 {
@@ -14,32 +16,120 @@ namespace FinanceTrack.Controllers
             _transactionService = transactionService;
         }
 
-        public IActionResult Ledger()
+        // Mark a transaction as Paid (Receivable / Payable)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult MarkPaid(int id)
         {
-            var transactions = _transactionService.GetAllTransactions();
+            _transactionService.UpdateTransactionStatus(id, "Paid");
+            return RedirectToAction(nameof(ReceivablePayable));
+        }
+
+        // Ledger with filters
+        public IActionResult Ledger(string? type, string? status, DateTime? startDate, DateTime? endDate)
+        {
+            var transactions = _transactionService.GetFilteredTransactions(type, status, startDate, endDate);
+
+            ViewBag.Type = type;
+            ViewBag.Status = status;
+            ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
+
             return View(transactions);
         }
 
+        // Details
+        public IActionResult Details(int id)
+        {
+            var transaction = _transactionService.GetTransactionById(id);
+            if (transaction == null)
+                return NotFound();
+
+            return View(transaction);
+        }
+
+        // Create Transaction
+        public IActionResult Create() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Transaction transaction)
+        {
+            if (!ModelState.IsValid)
+                return View(transaction);
+
+            _transactionService.AddTransaction(transaction);
+            return RedirectToAction(nameof(Ledger));
+        }
+
+        // Edit Transaction
+        public IActionResult Edit(int id)
+        {
+            var transaction = _transactionService.GetTransactionById(id);
+            if (transaction == null)
+                return NotFound();
+
+            return View(transaction);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Transaction transaction)
+        {
+            if (!ModelState.IsValid)
+                return View(transaction);
+
+            _transactionService.UpdateTransaction(transaction);
+            return RedirectToAction(nameof(Ledger));
+        }
+
+        // Delete Transaction
+        public IActionResult Delete(int id)
+        {
+            var transaction = _transactionService.GetTransactionById(id);
+            if (transaction == null)
+                return NotFound();
+
+            return View(transaction);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            _transactionService.DeleteTransaction(id);
+            return RedirectToAction(nameof(Ledger));
+        }
+
+        // Receivable / Payable
         public IActionResult ReceivablePayable()
         {
-            return View();
+            var transactions = _transactionService.GetFilteredTransactions(null, "Pending", null, null);
+            return View(transactions);
         }
 
+        // Expenses view
         public IActionResult Expenses()
         {
-            return View();
+            var transactions = _transactionService.GetFilteredTransactions("Expense", null, null, null);
+            return View(transactions);
         }
 
+        // Income view
         public IActionResult Income()
         {
-            return View();
+            var transactions = _transactionService.GetFilteredTransactions("Income", null, null, null);
+            return View(transactions);
         }
 
+        // Assets & Liabilities view
         public IActionResult AssetsLiabilities()
         {
             ViewBag.TotalAssets = _transactionService.GetTotalAssets();
             ViewBag.TotalLiabilities = _transactionService.GetTotalLiabilities();
-            return View();
+
+            var transactions = _transactionService.GetFilteredTransactions(null, null, null, null);
+            return View(transactions);
         }
     }
 }

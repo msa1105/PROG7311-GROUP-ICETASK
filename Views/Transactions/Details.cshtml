@@ -1,0 +1,18 @@
+﻿@model FinanceTrack.Models.Transaction
+@{
+    ViewData["Title"] = "Transaction Details";
+}
+
+<h2>Transaction #@Model.Id Details</h2>
+
+<table class="table">
+    <tr><th>Date</th><td>@Model.Date.ToShortDateString()</td></tr>
+    <tr><th>Type</th><td>@Model.Type</td></tr>
+    <tr><th>Entity</th><td>@Model.EntityName</td></tr>
+    <tr><th>Category</th><td>@Model.Category</td></tr>
+    <tr><th>Amount</th><td>R @Model.Amount.ToString("N2")</td></tr>
+    <tr><th>Status</th><td>@Model.Status</td></tr>
+    <tr><th>Due Date</th><td>@(Model.DueDate?.ToShortDateString() ?? "-")</td></tr>
+</table>
+
+<a asp-action="Ledger" class="btn">Back to Ledger</a>
