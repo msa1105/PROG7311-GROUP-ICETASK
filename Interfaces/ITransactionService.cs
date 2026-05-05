@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.Generic;   
 using FinanceTrack.Models;
 
 namespace FinanceTrack.Interfaces
@@ -9,7 +9,7 @@ namespace FinanceTrack.Interfaces
         Transaction GetTransactionById(int id);
         void AddTransaction(Transaction transaction);
         void UpdateTransactionStatus(int id, string targetStatus);
-        
+
         // Specific queries for the dashboard and views
         decimal GetTotalBalance();
         decimal GetNetProfit();
