@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FinanceTrack.Data;
@@ -18,6 +19,8 @@ namespace FinanceTrack.Services
 
         public void AddTransaction(Transaction transaction)
         {
+            transaction.CreatedAt = DateTime.UtcNow;
+            transaction.UpdatedAt = DateTime.UtcNow;
             _context.Transactions.Add(transaction);
             _context.SaveChanges();
         }
@@ -56,19 +59,52 @@ namespace FinanceTrack.Services
             return _context.Transactions.Where(t => t.Type == "Liability").Sum(t => t.Amount);
         }
 
-        public Transaction GetTransactionById(int id)
+        public Transaction? GetTransactionById(int id)
         {
             return _context.Transactions.FirstOrDefault(t => t.Id == id);
         }
 
         public void UpdateTransactionStatus(int id, string targetStatus)
         {
-            var tx = GetTransactionById(id);
-            if (tx != null)
-            {
-                tx.Status = targetStatus;
-                _context.SaveChanges();
-            }
+            var updatedAt = DateTime.UtcNow;
+            _context.Transactions
+                .Where(t => t.Id == id)
+                .ExecuteUpdate(s => s
+                    .SetProperty(t => t.Status, targetStatus)
+                    .SetProperty(t => t.UpdatedAt, updatedAt));
+        }
+
+        public void UpdateTransaction(Transaction transaction)
+        {
+            transaction.UpdatedAt = DateTime.UtcNow;
+            _context.Transactions.Update(transaction);
+            _context.SaveChanges();
+        }
+
+        public void DeleteTransaction(int id)
+        {
+            _context.Transactions
+                .Where(t => t.Id == id)
+                .ExecuteDelete();
+        }
+
+        public IEnumerable<Transaction> GetFilteredTransactions(string? type, string? status, DateTime? startDate, DateTime? endDate)
+        {
+            var query = _context.Transactions.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(type))
+                query = query.Where(t => t.Type == type);
+
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(t => t.Status == status);
+
+            if (startDate.HasValue)
+                query = query.Where(t => t.Date >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(t => t.Date <= endDate.Value);
+
+            return query.OrderByDescending(t => t.Date).ToList();
         }
     }
 }

@@ -24,4 +24,6 @@ RUN dotnet publish "FinanceTrack.csproj" -c Release -o /app/publish /p:UseAppHos
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Ensure the data directory exists for the SQLite volume mount
+RUN mkdir -p /app/data
 ENTRYPOINT ["dotnet", "FinanceTrack.dll"]

@@ -17,25 +17,69 @@ namespace FinanceTrack.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Seed initial data directly into SQLite
-            modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, Name = "Admin User", Email = "admin@financetrack.com", Role = "Admin" },
-                new User { Id = 2, Name = "Staff Member", Email = "staff@financetrack.com", Role = "Staff" }
-            );
+            // ── User configuration ──────────────────────────────────────────
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.Id);
 
-            var today = System.DateTime.Today;
-            modelBuilder.Entity<Transaction>().HasData(
-                new Transaction { Id = 1, Date = today.AddMonths(-1), Amount = 28000, Type = "Income", Status = "Paid", Category = "Service Fees", EntityName = "Future Tech", DueDate = today.AddDays(-5) },
-                new Transaction { Id = 2, Date = today.AddMonths(-2), Amount = 14500, Type = "Income", Status = "Paid", Category = "Product Sales", EntityName = "New Customer", DueDate = today.AddDays(-12) },
-                new Transaction { Id = 3, Date = today.AddMonths(-1).AddDays(-5), Amount = 5000, Type = "Expense", Status = "Paid", Category = "Rent", EntityName = "Property Management Co", DueDate = today.AddMonths(-1) },
-                new Transaction { Id = 4, Date = today.AddMonths(-3), Amount = 18000, Type = "Expense", Status = "Paid", Category = "Salaries", EntityName = "Employees", DueDate = today.AddMonths(-3) },
-                new Transaction { Id = 5, Date = today, Amount = 12000, Type = "Liability", Status = "Pending", Category = "Credit Line", EntityName = "Business Credit Card", DueDate = today.AddDays(20) },
-                new Transaction { Id = 6, Date = today.AddDays(-2), Amount = 830, Type = "Expense", Status = "Pending", Category = "Utilities", EntityName = "Electric Company", DueDate = today.AddDays(5) },
-                new Transaction { Id = 7, Date = today.AddDays(15), Amount = 66000, Type = "Receivable", Status = "Pending", Category = "Service Fees", EntityName = "Giant Corp", DueDate = today.AddDays(15) },
-                new Transaction { Id = 8, Date = today.AddDays(-10), Amount = 150000, Type = "Liability", Status = "Pending", Category = "Loans", EntityName = "Bank Ltd", DueDate = today.AddDays(300) },
-                new Transaction { Id = 9, Date = today.AddMonths(-6), Amount = 170000, Type = "Asset", Status = "Paid", Category = "Equipment", EntityName = "Asset Vendor", DueDate = today.AddMonths(-6) },
-                new Transaction { Id = 10, Date = today.AddMonths(-1), Amount = 55000, Type = "Asset", Status = "Paid", Category = "Cash Equivalents", EntityName = "Bank Ltd", DueDate = today.AddMonths(-1) }
-            );
+                entity.HasIndex(u => u.Email)
+                      .IsUnique()
+                      .HasDatabaseName("IX_Users_Email");
+
+                entity.Property(u => u.Name).IsRequired().HasMaxLength(100);
+                entity.Property(u => u.Email).IsRequired().HasMaxLength(200);
+                entity.Property(u => u.PasswordHash).IsRequired().HasMaxLength(256);
+                entity.Property(u => u.Role).IsRequired().HasMaxLength(50).HasDefaultValue("Staff");
+            });
+
+            // ── Transaction configuration ────────────────────────────────────
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+
+                entity.Property(t => t.Amount)
+                      .IsRequired()
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(t => t.Type).IsRequired().HasMaxLength(50);
+                entity.Property(t => t.Status).IsRequired().HasMaxLength(50).HasDefaultValue("Pending");
+                entity.Property(t => t.Category).IsRequired().HasMaxLength(100);
+                entity.Property(t => t.EntityName).HasMaxLength(200);
+
+                // Index on Date for fast ledger/date-range queries
+                entity.HasIndex(t => t.Date)
+                      .HasDatabaseName("IX_Transactions_Date");
+
+                // Index on Type for fast category-filter queries
+                entity.HasIndex(t => t.Type)
+                      .HasDatabaseName("IX_Transactions_Type");
+
+                // Relationship: Transaction → User (optional FK so seeded
+                // transactions that predate any real user are still valid)
+                entity.HasOne(t => t.User)
+                      .WithMany(u => u.Transactions)
+                      .HasForeignKey(t => t.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // ── Audit column configuration ───────────────────────────────────
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.CreatedAt).IsRequired();
+                entity.Property(u => u.UpdatedAt).IsRequired();
+            });
+
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.Property(t => t.Description).HasMaxLength(500);
+                entity.Property(t => t.CreatedAt).IsRequired();
+                entity.Property(t => t.UpdatedAt).IsRequired();
+            });
+
+            // Seed data has been moved to DbInitializer.SeedData() so that
+            // runtime-relative dates (e.g. DateTime.Today) are not baked into
+            // the migration snapshot, which would cause migrations to regenerate
+            // on every build.
         }
     }
 }

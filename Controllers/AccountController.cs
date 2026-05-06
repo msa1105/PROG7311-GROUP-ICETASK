@@ -25,12 +25,9 @@ namespace FinanceTrack.Controllers
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
-            // Query physical SQLite database for user
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            
-            // Password validation is bypassed since we didn't add password hash to user model for the assignment,
-            // we just verify email exists.
-            if (user != null)
+
+            if (user != null && DbInitializer.VerifyPassword(password, user.PasswordHash))
             {
                 var claims = new List<Claim>
                 {
@@ -46,7 +43,7 @@ namespace FinanceTrack.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Error = "Account not found. Please register first.";
+            ViewBag.Error = "Invalid email or password.";
             return View();
         }
 
@@ -69,7 +66,8 @@ namespace FinanceTrack.Controllers
             {
                 Name = name,
                 Email = email,
-                Role = role
+                PasswordHash = DbInitializer.HashPassword(password),
+                Role = string.IsNullOrWhiteSpace(role) ? "Staff" : role
             };
 
             _context.Users.Add(newUser);

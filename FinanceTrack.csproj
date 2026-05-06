@@ -20,4 +20,12 @@
     </Content>
   </ItemGroup>
 
+  <!-- Exclude leftover duplicate folder from compilation -->
+  <ItemGroup>
+    <Compile Remove="FinanceTrack (2) (3)\**" />
+    <Content Remove="FinanceTrack (2) (3)\**" />
+    <EmbeddedResource Remove="FinanceTrack (2) (3)\**" />
+    <None Remove="FinanceTrack (2) (3)\**" />
+  </ItemGroup>
+
 </Project>

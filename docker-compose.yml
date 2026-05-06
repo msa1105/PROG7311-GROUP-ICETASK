@@ -10,4 +10,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
+    volumes:
+      - financedb:/app/data
     restart: unless-stopped
+
+volumes:
+  financedb:

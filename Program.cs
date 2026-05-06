@@ -9,11 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Fix for "lost connection on another PC":
-// Build an absolute path for the SQLite DB using the app's ContentRootPath.
-// This ensures the DB file is always found regardless of which directory
-// the app is launched from (Visual Studio, dotnet run, another PC, etc.)
-var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Finance.db");
+// Use /app/data when running in Docker, otherwise fall back to the local app folder
+var isDocker = Directory.Exists("/app/data");
+var dbFolder = isDocker ? "/app/data" : builder.Environment.ContentRootPath;
+var dbPath = Path.Combine(dbFolder, "Finance.db");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
 
@@ -33,7 +32,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.EnsureCreated();
+    DbInitializer.Initialize(context);
 }
 
 // Configure the HTTP request pipeline.

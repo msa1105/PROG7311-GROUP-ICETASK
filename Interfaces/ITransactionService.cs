@@ -6,11 +6,16 @@ namespace FinanceTrack.Interfaces
     public interface ITransactionService
     {
         IEnumerable<Transaction> GetAllTransactions();
-        Transaction GetTransactionById(int id);
+        Transaction? GetTransactionById(int id);
         void AddTransaction(Transaction transaction);
+        void UpdateTransaction(Transaction transaction);
         void UpdateTransactionStatus(int id, string targetStatus);
+        void DeleteTransaction(int id);
 
-        // Specific queries for the dashboard and views
+        // Filtered query used by Ledger, Expenses, Income, ReceivablePayable views
+        IEnumerable<Transaction> GetFilteredTransactions(string? type, string? status, DateTime? startDate, DateTime? endDate);
+
+        // Aggregates for the dashboard and summary views
         decimal GetTotalBalance();
         decimal GetNetProfit();
         decimal GetTotalAssets();
