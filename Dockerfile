@@ -27,3 +27,5 @@ COPY --from=publish /app/publish .
 # Ensure the data directory exists for the SQLite volume mount
 RUN mkdir -p /app/data
 ENTRYPOINT ["dotnet", "FinanceTrack.dll"]
+
+
