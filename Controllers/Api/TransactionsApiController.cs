@@ -43,5 +43,24 @@ namespace FinanceTrack.Controllers.Api
             _transactionService.UpdateTransactionStatus(id, status);
             return Ok();
         }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] Transaction transaction)
+        {
+            if (id != transaction.Id) return BadRequest();
+            var existing = _transactionService.GetTransactionById(id);
+            if (existing == null) return NotFound();
+            _transactionService.UpdateTransaction(transaction);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var existing = _transactionService.GetTransactionById(id);
+            if (existing == null) return NotFound();
+            _transactionService.DeleteTransaction(id);
+            return NoContent();
+        }
     }
 }
