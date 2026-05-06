@@ -26,14 +26,20 @@ namespace FinanceTrack.Controllers
         }
 
         // Ledger with filters
-        public IActionResult Ledger(string? type, string? status, DateTime? startDate, DateTime? endDate)
+        public IActionResult Ledger(string? type, string? status, DateTime? startDate, DateTime? endDate, string? search)
         {
             var transactions = _transactionService.GetFilteredTransactions(type, status, startDate, endDate);
+
+            if (!string.IsNullOrWhiteSpace(search))
+                transactions = transactions.Where(t =>
+                    (t.EntityName != null && t.EntityName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    t.Category.Contains(search, StringComparison.OrdinalIgnoreCase));
 
             ViewBag.Type = type;
             ViewBag.Status = status;
             ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
+            ViewBag.Search = search;
 
             return View(transactions);
         }

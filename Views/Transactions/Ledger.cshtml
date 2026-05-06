@@ -9,27 +9,29 @@
         <h1>General Ledger</h1>
         <p>Complete transaction history</p>
     </div>
-    <a href="#" class="btn">+ Add Transaction</a>
+    <a href="/Transactions/Create" class="btn">+ Add Transaction</a>
 </div>
 
-<div class="ledger-controls">
-    <input type="text" class="search-input" placeholder="Search by ID, entity name, or category..." />
-    <select class="filter-select">
-        <option>All Types</option>
-        <option>Income</option>
-        <option>Expense</option>
-        <option>Liability</option>
-        <option>Asset</option>
+<form method="get" action="/Transactions/Ledger" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+    <input type="text" name="search" class="search-input" placeholder="Search by entity or category..." value="@ViewBag.Search" />
+    <select name="type" class="filter-select">
+        <option value="">All Types</option>
+        @foreach (var t in new[]{"Income","Expense","Asset","Liability","Receivable"})
+        {
+            <option value="@t" selected="@(ViewBag.Type == t ? "selected" : null)">@t</option>
+        }
     </select>
-    <select class="filter-select">
-        <option>All Status</option>
-        <option>Pending</option>
-        <option>Paid</option>
+    <select name="status" class="filter-select">
+        <option value="">All Status</option>
+        <option value="Paid" selected="@(ViewBag.Status == "Paid" ? "selected" : null)">Paid</option>
+        <option value="Pending" selected="@(ViewBag.Status == "Pending" ? "selected" : null)">Pending</option>
     </select>
-    <input type="date" class="filter-select" />
-    <span style="color: var(--text-secondary); margin: 0 8px;">to</span>
-    <input type="date" class="filter-select" />
-</div>
+    <input type="date" name="startDate" class="filter-select" value="@ViewBag.StartDate" />
+    <span style="color: var(--text-secondary); margin: 0 4px; align-self:center;">to</span>
+    <input type="date" name="endDate" class="filter-select" value="@ViewBag.EndDate" />
+    <button type="submit" class="btn" style="padding: 8px 16px;">Filter</button>
+    <a href="/Transactions/Ledger" class="btn" style="padding: 8px 16px; background: var(--bg-secondary);">Clear</a>
+</form>
 
 <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
     Showing @Model.Count() transactions
@@ -47,6 +49,7 @@
                 <th>Amount</th>
                 <th>Status</th>
                 <th>Due Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -59,12 +62,17 @@
                     <td>@tx.EntityName</td>
                     <td>@tx.Category</td>
                     <td class="@(tx.Type == "Income" || tx.Type == "Asset" ? "positive" : "negative")" style="font-weight: 500;">
-                        @(tx.Type == "Income" || tx.Type == "Asset" ? "+" : "-")R @tx.Amount
+                        @(tx.Type == "Income" || tx.Type == "Asset" ? "+" : "-")R @tx.Amount.ToString("N2")
                     </td>
                     <td>
                         <span class="badge @(tx.Status.ToLower())">@tx.Status</span>
                     </td>
                     <td>@(tx.DueDate?.ToShortDateString() ?? "-")</td>
+                    <td style="display:flex; gap:6px;">
+                        <a href="/Transactions/Details/@tx.Id" class="btn" style="padding:4px 10px;font-size:12px;">View</a>
+                        <a href="/Transactions/Edit/@tx.Id" class="btn" style="padding:4px 10px;font-size:12px;background:var(--warning);color:#000;">Edit</a>
+                        <a href="/Transactions/Delete/@tx.Id" class="btn" style="padding:4px 10px;font-size:12px;background:var(--danger);">Delete</a>
+                    </td>
                 </tr>
             }
         </tbody>

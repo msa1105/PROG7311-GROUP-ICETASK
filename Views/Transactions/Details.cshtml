@@ -3,16 +3,28 @@
     ViewData["Title"] = "Transaction Details";
 }
 
-<h2>Transaction #@Model.Id Details</h2>
+<div class="page-header">
+    <div class="page-title">
+        <h1>Transaction #@Model.Id</h1>
+        <p>Full details for this transaction</p>
+    </div>
+</div>
 
-<table class="table">
-    <tr><th>Date</th><td>@Model.Date.ToShortDateString()</td></tr>
-    <tr><th>Type</th><td>@Model.Type</td></tr>
-    <tr><th>Entity</th><td>@Model.EntityName</td></tr>
-    <tr><th>Category</th><td>@Model.Category</td></tr>
-    <tr><th>Amount</th><td>R @Model.Amount.ToString("N2")</td></tr>
-    <tr><th>Status</th><td>@Model.Status</td></tr>
-    <tr><th>Due Date</th><td>@(Model.DueDate?.ToShortDateString() ?? "-")</td></tr>
-</table>
-
-<a asp-action="Ledger" class="btn">Back to Ledger</a>
+<div class="table-container" style="max-width:600px;">
+    <table>
+        <tr><th style="width:140px; color:var(--text-secondary);">Date</th><td>@Model.Date.ToShortDateString()</td></tr>
+        <tr><th style="color:var(--text-secondary);">Type</th><td><span class="badge type-@(Model.Type.ToLower())">@Model.Type</span></td></tr>
+        <tr><th style="color:var(--text-secondary);">Entity</th><td>@Model.EntityName</td></tr>
+        <tr><th style="color:var(--text-secondary);">Category</th><td>@Model.Category</td></tr>
+        <tr><th style="color:var(--text-secondary);">Amount</th><td style="font-weight:600;">R @Model.Amount.ToString("N2")</td></tr>
+        <tr><th style="color:var(--text-secondary);">Status</th><td><span class="badge @(Model.Status.ToLower())">@Model.Status</span></td></tr>
+        <tr><th style="color:var(--text-secondary);">Due Date</th><td>@(Model.DueDate?.ToShortDateString() ?? "-")</td></tr>
+        <tr><th style="color:var(--text-secondary);">Description</th><td>@(Model.Description ?? "-")</td></tr>
+        <tr><th style="color:var(--text-secondary);">Created</th><td>@Model.CreatedAt.ToLocalTime().ToString("g")</td></tr>
+        <tr><th style="color:var(--text-secondary);">Updated</th><td>@Model.UpdatedAt.ToLocalTime().ToString("g")</td></tr>
+    </table>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn" style="background:var(--warning);color:#000;">Edit</a>
+        <a asp-action="Ledger" class="btn" style="background:var(--bg-secondary);">Back to Ledger</a>
+    </div>
+</div>

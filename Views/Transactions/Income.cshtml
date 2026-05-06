@@ -1,0 +1,52 @@
+@model IEnumerable<FinanceTrack.Models.Transaction>
+@{
+    ViewData["Title"] = "Income";
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h1>Income</h1>
+        <p>All income transactions</p>
+    </div>
+    <a href="/Transactions/Create" class="btn">+ Add Transaction</a>
+</div>
+
+<div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+    Showing @Model.Count() income transactions
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Entity</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Due Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tx in Model)
+            {
+                <tr>
+                    <td style="color: var(--text-tertiary)">#@tx.Id</td>
+                    <td>@tx.Date.ToShortDateString()</td>
+                    <td>@tx.EntityName</td>
+                    <td>@tx.Category</td>
+                    <td class="positive" style="font-weight:500;">+R @tx.Amount.ToString("N2")</td>
+                    <td><span class="badge @(tx.Status.ToLower())">@tx.Status</span></td>
+                    <td>@(tx.DueDate?.ToShortDateString() ?? "-")</td>
+                    <td style="display:flex; gap:6px;">
+                        <a href="/Transactions/Details/@tx.Id" class="btn" style="padding:4px 10px;font-size:12px;">View</a>
+                        <a href="/Transactions/Edit/@tx.Id" class="btn" style="padding:4px 10px;font-size:12px;background:var(--warning);color:#000;">Edit</a>
+                        <a href="/Transactions/Delete/@tx.Id" class="btn" style="padding:4px 10px;font-size:12px;background:var(--danger);">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

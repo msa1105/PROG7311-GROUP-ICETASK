@@ -15,8 +15,10 @@
         <nav class="nav-links">
             <a href="/Home/Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">Dashboard</a>
             <a href="/Transactions/Ledger" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Ledger" ? "active" : "")">Ledger</a>
+            <a href="/Transactions/Income" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Income" ? "active" : "")">Income</a>
+            <a href="/Transactions/Expenses" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Expenses" ? "active" : "")">Expenses</a>
             <a href="/Transactions/ReceivablePayable" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "ReceivablePayable" ? "active" : "")">Receivable / Payable</a>
-            <a href="/Transactions/AssetsLiabilities" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "AssetsLiabilities" ? "active" : "")">Assets & Liabilities</a>
+            <a href="/Transactions/AssetsLiabilities" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "AssetsLiabilities" ? "active" : "")">Assets &amp; Liabilities</a>
         </nav>
         
         <form method="post" action="/Account/Logout" style="margin-top: auto;">

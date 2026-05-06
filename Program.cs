@@ -42,7 +42,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Skip HTTPS redirection in Docker (HTTP only on port 8080)
+if (!isDocker)
+{
+    app.UseHttpsRedirection();
+}
 
 // IMPORTANT: UseStaticFiles MUST come before UseRouting so that
 // CSS/JS files are served correctly in both Visual Studio (IIS Express)
@@ -53,6 +57,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers(); // required for attribute-routed API controllers
 
 app.MapControllerRoute(
     name: "default",
