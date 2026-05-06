@@ -133,19 +133,32 @@ body {
 }
 .search-input {
     flex: 1;
-    padding: 10px;
+    min-width: 180px;
+    padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 14px;
     color: var(--text-primary);
+    background: var(--bg-secondary);
+    font-family: inherit;
+}
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent);
 }
 .filter-select {
-    padding: 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 14px;
     color: var(--text-primary);
-    background: white;
+    background: var(--bg-secondary);
+    font-family: inherit;
+    cursor: pointer;
+}
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent);
 }
 
 /* Cards */
